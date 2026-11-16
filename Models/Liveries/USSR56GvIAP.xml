@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+
+<PropertyList>
+<sim>
+    <model>
+        <livery>
+            <name type="string">USSR, 56 GvIAP</name>
+
+            <texture>Liveries/USSR56GvIAP.png</texture>
+
+        </livery>
+		<spit>
+		 <hdr>false</hdr>
+		<als>true</als>
+		</spit>
+    </model>
+    <rendering>
+   <refl_correction type="string">-0.45</refl_correction>
+    </rendering>
+</sim>
+</PropertyList>

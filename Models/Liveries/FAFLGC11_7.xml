@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+
+<PropertyList>
+<sim>
+    <model>
+        <livery>
+            <name type="string">Free French Air Force, GC 11/7</name>
+
+            <texture>Liveries/FAFLGC11_7.png</texture>
+
+	
+        </livery>
+		<spit>
+		 <hdr>false</hdr>
+		<als>true</als>
+		</spit>
+    </model>
+ <rendering>
+   <refl_correction type="string">-0.45</refl_correction>
+    </rendering>
+</sim>
+</PropertyList>

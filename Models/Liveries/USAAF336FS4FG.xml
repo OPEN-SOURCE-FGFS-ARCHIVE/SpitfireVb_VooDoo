@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+
+<PropertyList>
+<sim>
+    <model>
+        <livery>
+            <name type="string">USAAF, 336 FS, 4 FG</name>
+
+            <texture>Liveries/USAAF336FS4FG.png</texture>
+
+	
+        </livery>
+		<spit>
+		 <hdr>false</hdr>
+		<als>true</als>
+		</spit>
+    </model>
+    <rendering>
+   <refl_correction type="string">-0.45</refl_correction>
+    </rendering>
+</sim>
+</PropertyList>

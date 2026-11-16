@@ -1,0 +1,409 @@
+<?xml version="1.0"?>
+<!-- Spitfire Vb by Vivian Meazza -->
+<PropertyList>
+	<path>vb-tub.ac</path>
+
+	<!-- ************* panel models ************* -->
+	<!-- blind flying instruments -->
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/asi.xml</path>
+		<!--3.26664	0.222092	0.0992981
+		3.26664	0.222092	0.0992981-->
+		<offsets>
+			<x-m>3.265</x-m>
+			<y-m>-0.0992981</y-m>
+			<z-m>0.222092</z-m>
+		</offsets>
+	</model>
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/attitude.xml</path>
+		<name>Attitude</name>
+		<!--3.26664	0.219903	1.29594e-008
+		3.26664	0.219903	1.29594e-008-->
+		<offsets>
+			<x-m>3.265</x-m>
+			<y-m>0.0</y-m>
+			<z-m>0.219903</z-m>
+		</offsets>
+	</model>
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/vsi.xml</path>
+		<!--3.26664	0.219903	-0.124499
+		3.26664	0.219903	-0.124499-->
+		<offsets>
+			<x-m>3.265</x-m>
+			<y-m>0.10</y-m>
+			<z-m>0.219903</z-m>
+		</offsets>
+	</model>
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/altimeter.xml</path>
+		<!--3.26664	0.123125	0.101239
+		3.26664	0.123125	0.101239-->
+		<name>Altimeter</name>
+		<offsets>
+			<x-m>3.265</x-m>
+			<y-m>-0.101239</y-m>
+			<z-m>0.123125</z-m>
+		</offsets>
+	</model>
+	<model>
+		<!--3.26664	0.118597	1.07102e-008
+		3.26664	0.118597	1.07102e-008-->
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/compass.xml</path>
+		<offsets>
+			<x-m>3.265</x-m>
+			<y-m>0</y-m>
+			<z-m>0.118597</z-m>
+		</offsets>
+	</model>
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/turn.xml</path>
+		<name>Turn</name>
+		<!--3.26664	0.118142	-0.121535
+		3.26664	0.118142	-0.121535-->
+		<offsets>
+			<x-m>3.265</x-m>
+			<y-m>0.10</y-m>
+			<z-m>0.118142</z-m>
+		</offsets>
+	</model>
+	<!-- end blind flying instruments -->
+	<!-- main panel -->
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/rgs-main-switch.xml</path>
+		<offsets>
+			<x-m>3.265</x-m>
+			<y-m>-0.09</y-m>
+			<z-m>0.315221</z-m>
+		</offsets>
+	</model>
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/rgs-dimmer-switch.xml</path>
+		<!--3.26663	0.315221	0.0519094
+		3.26663	0.315221	0.0519094-->
+		<offsets>
+			<x-m>3.265</x-m>
+			<y-m>-0.0519094</y-m>
+			<z-m>0.315221</z-m>
+		</offsets>
+	</model>
+
+	<!-- engine instruments -->
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/ammeter.xml</path>
+		<offsets>
+			<x-m>3.265</x-m>
+			<y-m>0.137895</y-m>
+			<z-m>0.3710</z-m>
+		</offsets>
+	</model>
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/boost.xml</path>
+		<!--3.26664	0.183456	-0.290907
+		3.26664	0.183456	-0.290907-->
+		<offsets>
+			<x-m>3.265</x-m>
+			<y-m>0.290907</y-m>
+			<z-m>0.183456</z-m>
+		</offsets>
+	</model>
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/rad-temp.xml</path>
+		<!--3.26664	0.104085	-0.341567
+	3.26664	0.104085	-0.341567-->
+		<offsets>
+			<x-m>3.265</x-m>
+			<y-m>0.3415679</y-m>
+			<z-m>0.104085</z-m>
+		</offsets>
+	</model>
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/oil-temp.xml</path>
+		<!--	3.26664	0.104085	-0.267929
+	3.26664	0.104085	-0.267929-->
+		<offsets>
+			<x-m>3.265</x-m>
+			<y-m>0.267929</y-m>
+			<z-m>0.104085</z-m>
+		</offsets>
+	</model>
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/rpm.xml</path>
+		<!--3.26664	0.262941	-0.22179
+		3.26664	0.262941	-0.22179
+		3.26663	0.269903	-0.226468
+		3.26663	0.269903	-0.226467-->
+		<offsets>
+			<x-m>3.265</x-m>
+			<y-m>0.226467</y-m>
+			<z-m>0.269903</z-m>
+		</offsets>
+	</model>
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/fuel-pressure-warning-light.xml</path>
+		<!--3.26677	0.185946	-0.193828
+		3.26677	0.185946	-0.193828-->
+		<offsets>
+			<x-m>3.265</x-m>
+			<y-m>0.193828</y-m>
+			<z-m>0.185946</z-m>
+		</offsets>
+	</model>
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/fuel.xml</path>
+		<offsets>
+			<x-m>3.265</x-m>
+			<y-m>0.304738</y-m>
+			<z-m>0.0177704</z-m>
+		</offsets>
+	</model>
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/oil-pressure.xml</path>
+		<!--3.26677	0.108834	-0.193828
+		3.26677	0.108834	-0.193828-->
+		<offsets>
+			<x-m>3.265</x-m>
+			<y-m>0.193828</y-m>
+			<z-m>0.108834</z-m>
+		</offsets>
+	</model>
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/starter.xml</path>
+		<!--3.26664	0.0100965	-0.0914805
+		3.26664	0.0100965	-0.0914805-->
+		<offsets>
+			<x-m>3.265</x-m>
+			<y-m>0.0914805</y-m>
+			<z-m>0.0100965</z-m>
+		</offsets>
+	</model>
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/cut-off.xml</path>
+		<offsets>
+			<x-m>3.265</x-m>
+			<y-m>0.22</y-m>
+			<z-m>-0.05</z-m>
+		</offsets>
+	</model>
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/primer.xml</path>
+		<offsets>
+			<x-m>3.265</x-m>
+			<y-m>0.16</y-m>
+			<z-m>-0.06</z-m>
+		</offsets>
+	</model>
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/fuel-cocks.xml</path>
+		<offsets>
+			<x-m>3.265</x-m>
+			<y-m>0.092</y-m>
+			<z-m>-0.12</z-m>
+		</offsets>
+	</model>
+	<!--    end engine instruments -->
+	<!-- miscellaneous (left panel) instruments -->
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/clock.xml</path>
+		<!--3.26664	0.128292	0.306873
+		3.26664	0.128292	0.306873-->
+		<offsets>
+			<x-m>3.265</x-m>
+			<y-m>-0.306873</y-m>
+			<z-m>0.1284</z-m>
+		</offsets>
+	</model>
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/trim.xml</path>
+		<!--3.26664	0.0850959	0.218664
+		3.26664	0.0850959	0.218664-->
+		<offsets>
+			<x-m>3.265</x-m>
+			<y-m>-0.218664</y-m>
+			<z-m>0.08509593</z-m>
+		</offsets>
+	</model>
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/triple.xml</path>
+		<!--3.26664	0.033435	0.29171
+		3.26664	0.033435	0.29171
+		3.26664	0.0177704	0.278682
+		3.26664	0.0177704	0.278682-->
+		<offsets>
+			<x-m>3.265</x-m>
+			<y-m>-0.29171</y-m>
+			<z-m>0.0177704</z-m>
+		</offsets>
+	</model>
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/magneto.xml</path>
+		<!--3.26664	0.0607927	0.36114
+		3.26664	0.0607927	0.36114-->
+		<offsets>
+			<x-m>3.265</x-m>
+			<y-m>-0.36114</y-m>
+			<z-m>0.057</z-m>
+		</offsets>
+	</model>
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/flaps.xml</path>
+		<!--3.26664	0.308911	0.20005
+		3.26664	0.308911	0.20005-->
+		<offsets>
+			<x-m>3.265</x-m>
+			<y-m>-0.20005</y-m>
+			<z-m>0.308911</z-m>
+		</offsets>
+	</model>
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/oxygen-control.xml</path>
+		<!--3.26664	0.229527	0.25126-->
+		<offsets>
+			<x-m>3.265</x-m>
+			<y-m>-0.25126</y-m>
+			<z-m>0.229527</z-m>
+		</offsets>
+	</model>
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/undercarriage-up-down.xml</path>
+		<name>Gear-Indicator</name>
+		<!--3.26664	0.158693	0.225371
+		3.26664	0.158693	0.225371-->
+		<offsets>
+			<x-m>3.265</x-m>
+			<y-m>-0.225371</y-m>
+			<z-m>0.158693</z-m>
+		</offsets>
+	</model>
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/dimmer.xml</path>
+		<!--3.26664	0.0100965	0.0272552
+		3.26664	0.0100965	0.0272552-->
+		<offsets>
+			<x-m>3.265</x-m>
+			<y-m>-0.0272552</y-m>
+			<z-m>0.0100965</z-m>
+		</offsets>
+	</model>
+
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/nav-light-switch.xml</path>
+		<!--3.26664	0.319142	0.242676
+		3.26664	0.319142	0.242676-->
+		<offsets>
+			<x-m>3.265</x-m>
+			<y-m>-0.242676</y-m>
+			<z-m>0.319142</z-m>
+		</offsets>
+	</model>
+
+	<!-- non-panel models -->
+	<model>
+		<path>Aircraft/Instruments-3d/SCR-522C/BC-602-A.xml</path>
+		<offsets>
+			<x-m>3.40</x-m>
+			<y-m>-0.32</y-m>
+			<z-m>0.175</z-m>
+			<pitch-deg>90</pitch-deg>
+			<roll-deg>-25</roll-deg>
+			<yaw-deg>25</yaw-deg>
+		</offsets>
+	</model>
+
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/throttle.xml</path>
+		<offsets>
+			<x-m>3.47</x-m>
+			<y-m>-0.37</y-m>
+			<z-m>-0.10</z-m>
+		</offsets>
+	</model>
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/uc-control.xml</path>
+		<offsets>
+			<x-m>3.45</x-m>
+			<y-m>0.3645</y-m>
+			<z-m>-0.120</z-m>
+			<pitch-deg>45</pitch-deg>
+		</offsets>
+	</model>
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/uc-emergency.xml</path>
+		<offsets>
+			<x-m>3.80</x-m>
+			<y-m>0.39</y-m>
+			<z-m>-0.225</z-m>
+		</offsets>
+	</model>
+	<!--	3.39461	-0.817523	0.0319045
+	3.39461	-0.817523	-0.0319045-->
+
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/control-stick.xml</path>
+		<offsets>
+			<x-m>3.460</x-m>
+			<y-m>-0.0</y-m>
+			<z-m>-0.80</z-m>
+		</offsets>
+	</model>
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/trim-wheel-elev.xml</path>
+		<offsets>
+			<x-m>3.60</x-m>
+			<y-m>-0.3725</y-m>
+			<z-m>-0.135</z-m>
+		</offsets>
+	</model>
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/trim-knob-rudder.xml</path>
+		<offsets>
+			<x-m>3.72</x-m>
+			<y-m>-0.3725</y-m>
+			<z-m>-0.16</z-m>
+		</offsets>
+	</model>
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/rgs-mk2.xml</path>
+		<name>Gunsight</name>
+		<offsets>
+			<x-m>3.39</x-m>
+			<y-m>-0.0</y-m>
+			<z-m>0.520</z-m>
+		</offsets>
+	</model>
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/panel/compass-p11.xml</path>
+		<offsets>
+			<x-m>3.275</x-m>
+			<y-m>-0.0</y-m>
+			<z-m>-0.175</z-m>
+		</offsets>
+	</model>
+
+<!-- cockpit floodlight -->
+ 
+ <model>
+      <path>Aircraft/SpitfireVb_VooDoo/Models/Lights/RedDashLight.xml</path>
+      <offsets> 
+        <x-m>3.6</x-m>
+        <y-m>-0.3</y-m>
+        <z-m>0.15</z-m>
+		<pitch-deg>-30</pitch-deg>
+		<heading-deg>-15</heading-deg>
+      </offsets>
+    </model>
+	
+	 <model>
+      <path>Aircraft/SpitfireVb_VooDoo/Models/Lights/RedDashLight.xml</path>
+      <offsets> 
+        <x-m>3.6</x-m>
+        <y-m>0.3</y-m>
+        <z-m>0.15</z-m>
+		<pitch-deg>-30</pitch-deg>
+		<heading-deg>15</heading-deg>
+      </offsets>
+    </model>
+	
+</PropertyList>
+

@@ -1,0 +1,1243 @@
+<?xml version="1.0"?>
+
+<!-- Supermarine SpitfireVb_VooDoo -->
+
+<PropertyList>
+
+ <model>
+
+	<name>Shiny</name>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/SpitfireVb-hdr.xml</path>
+</model>
+
+<animation>
+	<type>select</type>
+	<object-name>Shiny</object-name>
+	<condition>
+	 <property>sim/model/spit/hdr</property> 
+	
+	
+	</condition>
+</animation>
+
+
+<model>
+
+	<name>NonShiny</name>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/SpitfireVb-als.xml</path>
+</model>
+
+<animation>
+	<type>select</type>
+	<object-name>NonShiny</object-name>
+	<condition>
+	<property>sim/model/spit/als</property>
+	
+	</condition>
+</animation>
+ 
+ <sound><path>Aircraft/SpitfireVb_VooDoo/Sounds/mp-sound.xml</path></sound>
+
+  <nasal>
+        <load>
+            var livery_update = aircraft.livery_update.new("Aircraft/SpitfireVb_VooDoo/Models/liveries", 30);
+			
+			var self = cmdarg();
+			
+			var aliases = [];
+			for (var i = 0; i &lt; 6; i += 1) {
+				var door = self.getNode("sim/model/bo105/doors/door[" ~ i ~ "]/position-norm", 1);
+				var generic = self.getNode("sim/multiplay/generic/float[" ~ i ~ "]", 1);
+				door.alias(generic);
+				append(aliases, door);
+			
+			}
+
+			
+    <![CDATA[
+var root = cmdarg();
+var rootindex = root.getIndex();
+var mpPath = "/ai/models/multiplayer["~ rootindex ~"]/";
+
+var lightsPath = mpPath~"lightpack/"; #path to the property node, where all internal values are placed
+
+props.globals.initNode(mpPath~"sim/is-MP-Aircraft", 1, "BOOL");
+      
+srand();
+#wherever you want to add randomization of time, use something like:  + rand()*0.05-0.025 (included by default where appropriate)
+
+
+#list of switches for lights - if you don't intend to use some light, assign it nil value instead, like whateverSwitch = nil; and you don't need to care about anything else
+#IMPORTANT: don't put / on the start of the string, it's already included in the mpPath property
+var navSwitch = mpPath~"controls/lighting/nav-lights-switch";
+var beaconSwitch = mpPath~"controls/lighting/beacon-switch";
+var strobeSwitch = mpPath~"controls/lighting/strobe-switch";
+var landingSwitch = mpPath~"controls/lighting/landing-lights-switch";
+var taxiSwitch = mpPath~"controls/lighting/taxi-light-switch";
+var probeSwitch = mpPath~"controls/lighting/probe-light-switch";
+var whiteSwitch = mpPath~"controls/lighting/white-light-switch";
+var searchSwitch = mpPath~"controls/lighting/search-light-switch";
+#switch this from 1 to 0 if you want to use advanced cyclical fading animation of the the nav lights instead of being stable on when the switch is on
+navStillOn = 1;
+
+
+#I need to set listener on some MP transferred properties; this doesn't seem to work well sometimes, so I mirror them to the original location on any change
+#This also simplifies work as I can use almost the same code for MP as is the local Nasal. Furthermore, I can use meaningful property names in the model XML files instead of referencing the MP properties. 
+var mpVar = {
+	new: func(propIn, propOut) {
+		var m = { parents: [mpVar] };
+		m.propIn = propIn;
+		m.propOut = propOut;
+		if(propIn==nil or propOut==nil) return m;
+		m.value = getprop(propIn);
+		setprop(propOut, m.value);
+		return m;
+	},
+	check: func {
+		if(me.propIn==nil or me.propOut==nil) return;
+		var newValue = getprop(me.propIn);
+		if(newValue != me.value) {
+			setprop(me.propOut, newValue);
+			me.value = newValue;
+			#print("value of "~me.propOut~" changed: "~newValue);
+		}
+	},
+};
+#init any property copy object needed in this array (anything you need to transfer over MP, but you are using the original paths in your xmls)
+#also used for properties you are using a listener on, or properties which you maybe want to manipulate during the <unload> 
+#if you're just using the pack, change the values according to the MP bindings in the -set.xml file
+#you don't need to delete the entries if the path is nil - it gets skipped automatically and the MP path is just ignored
+var mirrorValues = [
+	mpVar.new(mpPath~"sim/multiplay/generic/int[7]", mpPath~"sim/crashed"),
+	mpVar.new(mpPath~"sim/multiplay/generic/int[0]", navSwitch),
+	mpVar.new(mpPath~"sim/multiplay/generic/int[1]", beaconSwitch),
+	mpVar.new(mpPath~"sim/multiplay/generic/int[1]", strobeSwitch),
+	mpVar.new(mpPath~"sim/multiplay/generic/int[2]", landingSwitch),
+	mpVar.new(mpPath~"sim/multiplay/generic/int[3]", taxiSwitch),
+	mpVar.new(mpPath~"sim/multiplay/generic/int[3]", probeSwitch),
+	mpVar.new(mpPath~"sim/multiplay/generic/int[0]", whiteSwitch),
+	mpVar.new(mpPath~"sim/multiplay/generic/int[8]", searchSwitch),
+];
+#loop at the default MP transfer frequency (10Hz)
+var mirrorTimer = maketimer(0.1, func {
+	foreach(var mir; mirrorValues) {
+		mir.check();
+	}
+});
+mirrorTimer.start();
+
+
+
+#### NAV LIGHTS ####
+
+#class for a periodic fade in/out animation - for flashing, use rather standard aircraft.light.new(), as in Beacon and Strobe section
+var lightCycle = {
+	#constructor
+	new: func(propSwitch, propOut) {
+		m = { parents: [lightCycle] };
+		props.globals.initNode(propOut, 0, "DOUBLE");
+		props.globals.initNode(propSwitch, 1, "BOOL");
+		m.fadeIn = 0.4 + rand()*0.05-0.025; #fade in time
+		m.fadeOut = 0.4 + rand()*0.05-0.025; #fade out time
+		m.stayOn = 1.5 + rand()*0.05-0.025; #stable on period
+		m.stayOff = 1 + rand()*0.05-0.025; #stable off period
+		m.turnOff = 0.12; #fade out time when turned off
+		m.phase = 0; #phase to be run on next timer call: 0 -> fade in, 1 -> stay on, 2 -> fade out, 3 -> stay off
+		m.cycleTimer = maketimer(0.1, func {
+			if(getprop(propSwitch)) {
+				if(m.phase == 0) {
+					interpolate(propOut, 1, m.fadeIn);
+					m.phase = 1;
+					m.cycleTimer.restart(m.fadeIn);
+				}
+				else if(m.phase == 1){
+					m.phase = 2;
+					m.cycleTimer.restart(m.stayOn);
+				}
+				else if(m.phase == 2){
+					interpolate(propOut, 0, m.fadeOut);
+					m.phase = 3;
+					m.cycleTimer.restart(m.fadeOut);
+				}
+				else if(m.phase == 3){
+					m.phase = 0;
+					m.cycleTimer.restart(m.stayOff);
+				}
+			}
+			else {
+				interpolate(propOut, 0, m.turnOff); #kills any currently ongoing interpolation
+				m.phase = 0;
+			}
+		});
+		m.cycleTimer.singleShot = 1;
+		if(propSwitch==nil) {
+			m.listen = nil;
+			return m;
+		}
+		m.listen = setlistener(propSwitch, func{m.cycleTimer.restart(0);}); #handle switch changes
+		m.cycleTimer.restart(0); #start the looping
+		return m;
+	},
+	#destructor
+	del: func {
+		if(me.listen!=nil) removelistener(me.listen);
+		me.cycleTimer.stop();
+	},
+};
+
+#By default, the switch property is initialized to 1 (only if no value is already assigned). Don't change the class implementation! To override this, set the property manually. You don't need to care if any other code already does it for you. 
+var navLights = nil;
+if(!navStillOn) {
+	navLights = lightCycle.new(navSwitch, lightsPath~"nav-lights-intensity");
+	### Uncomment and tune those to customize times ###
+	#navLights.fadeIn = 0.4; #fade in time 
+	#navLights.fadeOut = 0.4; #fade out time
+	#navLights.stayOn = 3 + rand()*0.05-0.025; #stable on period
+	#navLights.stayOff = 0.6; #stable off period
+	#navLights.turnOff = 0.12; #fade out time when turned off
+}
+
+
+### BEACON ###
+var beacon = nil;
+if(beaconSwitch!=nil) {
+	props.globals.initNode(beaconSwitch, 1, "BOOL");
+	beacon = aircraft.light.new(lightsPath~"beacon-state", 
+		[0.0, 1.0 + rand()*0.05-0.025], beaconSwitch);
+}
+	
+	
+### STROBE ###
+var strobe = nil;
+if(strobeSwitch!=nil) {
+	props.globals.initNode(strobeSwitch, 1, "BOOL");
+	strobe = aircraft.light.new(lightsPath~"strobe-state", 
+		[0.0, 0.87 + rand()*0.05-0.025], strobeSwitch);
+}
+
+
+### LIGHT FADING ###
+
+#class for controlling fade in/out behavior - propIn is a control property (handled as a boolean) and propOut is interpolated
+#all light brightness animations in xmls depend on propOut (Rembrandt brightness, material emission, flares transparency, ...)
+var lightFadeInOut = {
+	#constructor
+	new: func(propSwitch, propOut) {
+		m = { parents: [lightFadeInOut] };
+		m.fadeIn = 0.3; #some sane defaults
+		m.fadeOut = 0.4;
+		if(propSwitch==nil) {
+			m.listen = nil;
+			return m;
+		}
+		props.globals.initNode(propSwitch, 1, "BOOL");
+		m.isOn = getprop(propSwitch);
+		props.globals.initNode(propOut, m.isOn, "DOUBLE");
+		m.listen = setlistener(propSwitch, 
+			func {
+				if(m.isOn and !getprop(propSwitch)) {
+					interpolate(propOut, 0, m.fadeOut);
+					m.isOn = 0;
+				}
+				if(!m.isOn and getprop(propSwitch)) {
+					interpolate(propOut, 1, m.fadeIn);
+					m.isOn = 1;
+				}
+			}
+		);
+		return m;
+	},
+	#destructor
+	del: func {
+		if(me.listen!=nil) removelistener(me.listen);
+	},
+};
+
+fadeLanding = lightFadeInOut.new(landingSwitch, lightsPath~"landing-lights-intensity");
+fadeLanding = lightFadeInOut.new(searchSwitch, lightsPath~"search-lights-intensity");
+fadeTaxi = lightFadeInOut.new(taxiSwitch, lightsPath~"taxi-light-intensity");
+fadeProbe = lightFadeInOut.new(probeSwitch, lightsPath~"probe-light-intensity");
+fadeWhite = lightFadeInOut.new(whiteSwitch, lightsPath~"white-light-intensity");
+if(navStillOn) {
+	navLights = lightFadeInOut.new(navSwitch, lightsPath~"nav-lights-intensity");
+	navLights.fadeIn = 0.1;
+	navLights.fadeOut = 0.12;
+}
+#manipulate times if defaults don't fit your needs:
+#fadeLanding.fadeIn = 0.5;
+#fadeLanding.fadeOut = 0.8;
+
+
+### the rest of your model load embedded Nasal code ###
+
+    ]]>
+		
+        </load>
+
+        <unload>
+			  #prevent multiple timers and listeners from running and fighting on next connect
+      #cleanly destroy MP property mirroring
+      mirrorTimer.stop();
+      mirrorTimer = nil;
+      mirrorValues = nil;
+      
+      #cleanly destroy nav lights
+      if(navStillOn) {
+      	navLights.del();
+      }
+      else {
+      	if(navSwitch!=nil) setprop(navSwitch, 0);
+      	navLights.del();
+      	if(navSwitch!=nil) navLights.cycleTimer = nil;
+      	navLights = nil;
+      }
+      
+      #cleanly destroy beacon
+      if(beaconSwitch!=nil) setprop(beaconSwitch, 0);
+      beacon.del();
+      beacon = nil;
+      
+      #cleanly destroy strobe
+      if(strobeSwitch!=nil) setprop(strobeSwitch, 0);
+      strobe.del();
+      strobe = nil;
+      
+      #cleanly destroy light fade in/out animation objects
+      fadeLanding.del();
+      fadeTaxi.del();
+      fadeProbe.del();
+      fadeWhite.del();
+      
+      ### the rest of your model unload embedded Nasal code ###
+            livery_update.stop();
+			
+        </unload>
+    </nasal>
+
+ <animation>
+    <type>material</type>
+    <object-name>NewHull1</object-name>
+    <object-name>canopyframe</object-name>
+    <object-name>sub01</object-name>
+    <object-name>Rudder</object-name>
+    <object-name>PortAileron</object-name>
+    <object-name>Pitch_pivo</object-name>
+    <object-name>StarboardAileron</object-name>
+    <object-name>PortFlap</object-name>
+    <object-name>StarboardFlap</object-name>
+    <object-name>Port_Gear</object-name>
+    <object-name>Starboard_Gear</object-name>
+    <property-base>sim/model/livery</property-base>
+    <texture-prop>texture</texture-prop>
+    <texture>spitfire_colour.png</texture>
+  </animation>
+ 
+  
+ <model>
+	<name>cockpit</name>
+  <path>Aircraft/SpitfireVb_VooDoo/Models/panel/panel.xml</path>
+  <offsets>
+        <x-m>0.4</x-m>
+        <y-m>0.0</y-m>
+        <z-m>0.08</z-m>
+  </offsets>
+  <overlay>
+		 <animation n="100">
+    <type>scale</type>
+    <property>constants/zero</property>
+    <x-offset>0.97</x-offset>
+    <y-offset>0.97</y-offset>
+    <z-offset>0.97</z-offset>
+   </animation>
+  </overlay>
+ </model>
+ 
+	<animation>
+  <object-name>cockpit</object-name>
+		<type>range</type>
+		<min-m>0</min-m>
+		<max-m>50</max-m>
+	</animation>
+	
+
+<model>
+	<name>FTag Smoke</name>
+	<path>Aircraft/SpitfireVb_VooDoo/Models/Effects/ftag_smoke/ftag_smoke.xml</path>
+	<offsets>
+        <x-m>9.0</x-m>
+        <y-m>0.0</y-m>
+        <z-m>-0.5</z-m>
+	</offsets>
+</model>	
+	
+	
+
+
+<!-- Pilot Head -->
+
+<animation>
+  <type>rotate</type>
+  <object-name>PilotHead</object-name>
+  <property>surface-positions/rudder-pos-norm</property>
+  <factor>40</factor>
+ <center>
+   <x-m>4.293</x-m>
+   <y-m>0.000</y-m>
+   <z-m>0.452</z-m>
+  </center>
+  <axis>
+   <x>0.000000</x>
+   <y>0.000000</y>
+   <z>-1.000000</z>
+  </axis>
+ </animation>
+
+<animation>
+  <type>rotate</type>
+  <object-name>PilotHead</object-name>
+  <property>sim/multiplay/generic/float[13]</property>
+  <factor>-10</factor>
+  <center>
+   <x-m>4.293</x-m>
+   <y-m>0.000</y-m>
+   <z-m>0.452</z-m>
+  </center>>
+  <axis>
+   <x>1.000000</x>
+   <y>0.000000</y>
+   <z>0.000000</z>
+  </axis>
+ </animation>
+
+<animation>
+  <type>rotate</type>
+  <object-name>PilotHead</object-name>
+  <property>surface-positions/elevator-pos-norm</property>
+  <factor>-10</factor>
+  <center>
+   <x-m>4.293</x-m>
+   <y-m>0.000</y-m>
+   <z-m>0.452</z-m>
+  </center>
+  <axis>
+   <x>0.000000</x>
+   <y>1.000000</y>
+   <z>0.000000</z>
+  </axis>
+ </animation>
+
+<!-- Canopy Animation -->
+    
+  <animation>
+    <type>translate</type>
+    <object-name>canopyframe</object-name>
+    <object-name>canopy</object-name>
+    <object-name>canopyin</object-name>
+    <property>sim/multiplay/generic/float[0]</property>
+    <factor>0.495</factor>
+    <center> 
+        <x-m>0.051</x-m>
+        <y-m>0.000</y-m>
+        <z-m>-0.492</z-m>
+   </center>
+    <axis>
+      <x>0.460</x>
+      <y>0</y>
+      <z>0</z>
+    </axis>
+  </animation>
+
+<!-- Cranking effects -->
+  <!-- Port -->
+  <model>
+    <path>Aircraft/SpitfireVb_VooDoo/Models/Effects/cranking/cranking.xml</path>
+    <offsets>
+      <x-m>1.548 </x-m>
+      <y-m>-0.509</y-m>
+      <z-m>0.143</z-m>
+      <heading-deg> -30 </heading-deg>
+    </offsets>
+  </model>
+
+  <model>
+    <path>Aircraft/SpitfireVb_VooDoo/Models/Effects/cranking/cranking.xml</path>
+    <offsets>
+      <x-m>2.252</x-m>
+      <y-m>-0.509</y-m>
+      <z-m>0.143</z-m>
+      <heading-deg> -30 </heading-deg>
+    </offsets>
+  </model>
+
+  
+
+  
+
+  <!-- Star -->
+  <model>
+    <path>Aircraft/SpitfireVb_VooDoo/Models/Effects/cranking/cranking.xml</path>
+    <offsets>
+      <x-m>1.548 </x-m>
+      <y-m>0.509</y-m>
+      <z-m>0.143</z-m>
+      <heading-deg> -30 </heading-deg>
+    </offsets>
+  </model>
+
+  <model>
+    <path>Aircraft/SpitfireVb_VooDoo/Models/Effects/cranking/cranking.xml</path>
+    <offsets>
+      <x-m>2.252</x-m>
+      <y-m>0.509</y-m>
+      <z-m>0.143</z-m>
+      <heading-deg> -30 </heading-deg>
+    </offsets>
+  </model>
+
+  <model>
+    <path>Aircraft/SpitfireVb_VooDoo/Models/Effects/cranking/cranking.xml</path>
+    <offsets>
+      <x-m>2.193</x-m>
+      <y-m>-0.506</y-m>
+      <z-m>0.146</z-m>
+      <heading-deg> -30 </heading-deg>
+    </offsets>
+  </model>
+
+   
+<!--Contrails-->
+
+<model>
+    <path>Aircraft/SpitfireVb_VooDoo/Models/Effects/contrail.xml</path>
+    <offsets>
+     <x-m>8.639</x-m>
+     <y-m> -0.523</y-m>
+     <z-m>0.166</z-m>
+    </offsets>
+  </model>
+
+<model>
+    <path>Aircraft/SpitfireVb_VooDoo/Models/Effects/contrail.xml</path>
+    <offsets>
+     <x-m>8.639</x-m>
+     <y-m> 0.523</y-m>
+     <z-m>0.166</z-m>
+    </offsets>
+  </model>
+
+<!-- Tire Smoke -->
+ 
+ <!--  Tail Wheel -->
+  <model>
+    <path>Aircraft/SpitfireVb_VooDoo/Models/Effects/ground/ground2.xml</path>
+    <offsets>
+      <x-m>8.691</x-m>
+      <y-m>0.000</y-m>
+      <z-m>-0.789</z-m>
+    </offsets>
+  </model>
+
+  <!-- Port Wheel -->
+  <model>
+    <path>Aircraft/SpitfireVb_VooDoo/Models/Effects/ground/ground1.xml</path>
+    <offsets>
+      <x-m>3.078</x-m>
+      <y-m> -1.053</y-m>
+      <z-m>-1.786</z-m>
+    </offsets>
+  </model>
+
+  <!-- Star Wheel -->
+  <model>
+    <path>Aircraft/SpitfireVb_VooDoo/Models/Effects/ground/ground0.xml</path>
+    <offsets>
+      <x-m>3.078</x-m>
+      <y-m>1.053</y-m>
+      <z-m>-1.786</z-m>
+    </offsets>
+  </model>
+
+<!-- Smoke Trail -->
+  <model>
+    <path>Aircraft/SpitfireVb_VooDoo/Models/Effects/exhaustsmoke.xml</path>
+    <offsets>
+	<x-m>4.491</x-m>
+        <y-m>0.500</y-m>
+        <z-m>0.146</z-m>
+    </offsets>
+  </model>
+
+ <model>
+    <path>Aircraft/SpitfireVb_VooDoo/Models/Effects/exhaustsmoke.xml</path>
+    <offsets>
+	<x-m>4.491</x-m>
+        <y-m>-0.500</y-m>
+        <z-m>0.146</z-m>
+   </offsets>>
+  </model>
+
+<!-- High Alpha vapour -->
+ 
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/Effects/wingtip-vortex.xml</path>
+		<offsets>
+			<x-m> 3.307</x-m>
+			<y-m>-5.391</y-m>
+			<z-m>-0.142</z-m>
+			<pitch-deg>0</pitch-deg>
+		</offsets>
+	</model>
+
+	<model>
+		<path>Aircraft/SpitfireVb_VooDoo/Models/Effects/wingtip-vortex.xml</path>
+		<offsets>
+			<x-m> 3.307</x-m>
+			<y-m> 5.391</y-m>
+			<z-m>-0.142</z-m>
+			<pitch-deg>0</pitch-deg>
+		</offsets>
+	</model>
+
+
+ <animation>
+  <type>select</type>
+  <object-name>prop</object-name>
+  <condition>
+   <less-than>
+    <property>engines/engine[0]/rpm</property>
+    <value>1000</value>
+   </less-than>
+  </condition>
+ </animation>
+
+
+<animation>
+  <type>spin</type>
+  <object-name>Spinner</object-name>
+    <property>engines/engine[0]/rpm</property>
+    <factor>-0.5</factor>
+  <center>
+   <x-m>0.83</x-m>
+   <y-m>0.0</y-m>
+   <z-m>0.081</z-m>
+  </center>
+  <axis>
+   <x>1.0</x>
+   <y>0.0</y>
+   <z>0.0</z>
+  </axis>
+ </animation>
+  <model> 
+   <path>Aircraft/SpitfireVb_VooDoo/Models/pdisk.xml</path>
+   <name>pdisk</name>
+		<nopreview/>
+    <offsets> 
+   <x-m>0.83</x-m>
+   <y-m>0.0</y-m>
+   <z-m>0.127</z-m>
+    </offsets>
+  </model>
+ <animation>
+  <type>spin</type>
+  <object-name>prop</object-name>
+  <property>engines/engine[0]/rpm</property>
+  <factor>-0.479</factor>
+  <center>
+   <x-m>0.83</x-m>
+   <y-m>0.0</y-m>
+   <z-m>0.081</z-m>
+  </center>
+  <axis>
+   <x>1.0</x>
+   <y>0.0</y>
+   <z>0.0</z>
+  </axis>
+ </animation>
+
+<animation>
+  <type>noshadow</type>
+  <object-name>slowpdisk</object-name>
+  <object-name>fastpdisk</object-name>
+</animation>
+
+ <animation>
+  <type>rotate</type>
+  <object-name>PortFlap</object-name>
+  <property>surface-positions/flap-pos-norm</property>
+  <factor>-80.0</factor>
+
+<center>
+   <x-m>4</x-m>
+   <y-m>-3.6</y-m>
+   <z-m>-0.47</z-m>
+  </center>
+
+  <axis>
+   <x1-m>3.7</x1-m>
+   <y1-m>-2.6</y1-m>
+   <z1-m>-0.45</z1-m>
+   <x2-m>3.5</x2-m>
+   <y2-m>-4.4</y2-m>
+   <z2-m>-0.25</z2-m>
+  </axis>
+ </animation>
+ 
+ <animation>
+  <type>rotate</type>
+  <object-name>StarboardFlap</object-name>
+  <property>surface-positions/flap-pos-norm</property>
+  <factor>80.0</factor>
+
+  <center>
+   <x-m>4</x-m>
+   <y-m>3.6</y-m>
+   <z-m>-0.47</z-m>
+  </center>
+
+  <axis>
+   <x1-m>3.7</x1-m>
+   <y1-m>2.6</y1-m>
+   <z1-m>-0.45</z1-m>
+   <x2-m>3.5</x2-m>
+   <y2-m>4.4</y2-m>
+   <z2-m>-0.25</z2-m>
+  </axis>
+ </animation>
+
+ <animation>
+  <type>rotate</type>
+  <object-name>coolflap.L</object-name>
+  <property>controls/engines/engine[0]/cowl-flaps-norm</property>
+  <factor>-60.0</factor>
+
+  <center>
+   <x-m>4.167</x-m>
+   <y-m>-0.836</y-m>
+   <z-m>-0.735</z-m>
+  </center>
+
+  <axis>
+   <x1-m>4.164</x1-m>
+   <y1-m>-0.557</y1-m>
+   <z1-m>-0.758</z1-m>
+   <x2-m>4.164</x2-m>
+   <y2-m>-1.114</y2-m>
+   <z2-m>-0.704</z2-m>
+  </axis>
+ </animation>
+ <animation>
+  <type>rotate</type>
+  <object-name>coolflap.R</object-name>
+  <property>controls/engines/engine[0]/cowl-flaps-norm</property>
+  <factor>60.0</factor>
+
+  <center>
+   <x-m>4.167</x-m>
+   <y-m>0.836</y-m>
+   <z-m>-0.735</z-m>
+  </center>
+
+  <axis>
+   <x1-m>4.164</x1-m>
+   <y1-m>0.557</y1-m>
+   <z1-m>-0.758</z1-m>
+   <x2-m>4.164</x2-m>
+   <y2-m>1.114</y2-m>
+   <z2-m>-0.704</z2-m>
+  </axis>
+ </animation>
+
+ <animation>
+  <type>rotate</type>
+  <object-name>PortAileron</object-name>
+  <property>sim/multiplay/generic/float[13]</property>
+  <factor>-18.0</factor>
+
+  <center>
+   <x-m>3.8</x-m>
+   <y-m>-3.6</y-m>
+   <z-m>-0.47</z-m>
+  </center>
+
+  <axis>
+   <x1-m>3.7</x1-m>
+   <y1-m>-2.6</y1-m>
+   <z1-m>-0.45</z1-m>
+   <x2-m>3.5</x2-m>
+   <y2-m>-4.4</y2-m>
+   <z2-m>-0.25</z2-m>
+  </axis>
+
+ </animation>
+
+ <animation>
+  <type>rotate</type>
+  <object-name>StarboardAileron</object-name>
+  <property>sim/multiplay/generic/float[13]</property>
+  <factor>-18.0</factor>
+
+ <center>
+   <x-m>3.8</x-m>
+   <y-m>3.6</y-m>
+   <z-m>-0.47</z-m>
+  </center>
+
+  <axis>
+   <x1-m>3.7</x1-m>
+   <y1-m>2.6</y1-m>
+   <z1-m>-0.45</z1-m>
+   <x2-m>3.5</x2-m>
+   <y2-m>4.4</y2-m>
+   <z2-m>-0.25</z2-m>
+  </axis>
+
+ </animation>
+
+ <animation>
+  <type>rotate</type>
+  <object-name>Rudder</object-name>
+  <property>surface-positions/rudder-pos-norm</property>
+  <factor>30.0</factor>
+
+  <center>
+   <x-m>8.66</x-m>
+   <y-m>0</y-m>
+   <z-m>0.5</z-m>
+  </center>
+
+  <axis>
+   <x>0.000000</x>
+   <y>0.000000</y>
+   <z>1.000000</z>
+  </axis>
+ </animation>
+
+ <animation>
+  <type>rotate</type>
+  <object-name>Pitch_pivo</object-name>
+  <property>surface-positions/elevator-pos-norm</property>
+  <factor>-18.0</factor>
+
+ <center>
+   <x-m>8.35</x-m>
+   <y-m>0</y-m>
+   <z-m>0.3</z-m>
+  </center>
+
+  <axis>
+   <x1-m>8.35</x1-m>
+   <y1-m>1.2</y1-m>
+   <z1-m>0.3</z1-m>
+   <x2-m>8.35</x2-m>
+   <y2-m>-1.2</y2-m>
+   <z2-m>0.3</z2-m>
+  </axis>
+ </animation>
+
+ <animation>
+  <type>rotate</type>
+  <object-name>elevator.R</object-name>
+  <property>surface-positions/elevator-pos-norm</property>
+  <interpolation>
+   <entry>
+    <ind>-1.0</ind>
+    <dep>-30.0</dep>
+   </entry>
+   <entry>
+    <ind>0.0</ind>
+    <dep>0</dep>
+   </entry>
+   <entry>
+    <ind>1.00</ind>
+    <dep>20.0</dep>
+   </entry>
+  </interpolation>
+  <center>
+   <x-m>9.012</x-m>
+   <y-m>0.702</y-m>
+   <z-m>0.405</z-m>
+  </center>
+  <axis>
+   <x>0.000000</x>
+   <y>1.000000</y>
+   <z>0.000000</z>
+   </axis>
+ </animation>
+
+<animation> 
+      <type>rotate</type>
+      <object-name>TailWheel</object-name>
+      <object-name>TailLowerStrut</object-name>
+      <property>sim/multiplay/generic/float[16]</property>
+      <factor>1</factor>
+      <center> 
+        <x-m>8.418</x-m>
+        <y-m>0</y-m>
+        <z-m>-0.344</z-m>
+      </center>
+      <axis> 
+        <x1-m>8.351</x1-m>
+        <y1-m>0</y1-m>
+        <z1-m>-0.567</z1-m>
+        <x2-m>8.332</x2-m>
+        <y2-m>0</y2-m>
+        <z2-m>-0.472</z2-m>
+      </axis>
+    </animation> 
+
+<animation> 
+      <type>rotate</type>
+      <object-name>TailWheel</object-name>
+      <object-name>TailLowerStrut</object-name>
+      <property>surface-positions/rudder-pos-norm</property>
+      <factor>30</factor>
+      <center> 
+        <x-m>8.418</x-m>
+        <y-m>0</y-m>
+        <z-m>-0.344</z-m>
+      </center>
+      <axis> 
+        <x1-m>8.351</x1-m>
+        <y1-m>0</y1-m>
+        <z1-m>-0.567</z1-m>
+        <x2-m>8.332</x2-m>
+        <y2-m>0</y2-m>
+        <z2-m>-0.472</z2-m>
+      </axis>
+    </animation> 
+
+  <animation>
+    <type>material</type>
+    <object-name>fuselage</object-name>
+    <object-name>wing.L</object-name>
+    <object-name>wing.R</object-name>
+    <object-name>stdtip.R</object-name>
+    <object-name>stdtip.L</object-name>
+    <object-name>aileron.L</object-name>
+    <object-name>aileron.R</object-name>
+    <object-name>flap1.L</object-name>
+    <object-name>flap1.R</object-name>
+    <object-name>flap2.L</object-name>
+    <object-name>flap2.R</object-name>
+    <object-name>Port_Gear</object-name>
+    <object-name>Starboard_Gear</object-name>
+    <object-name>stab.L</object-name>
+    <object-name>stab.R</object-name>
+    <object-name>elevator.L</object-name>
+    <object-name>elevator.R</object-name>
+    <object-name>coolflap.L</object-name>
+    <object-name>coolflap.R</object-name>
+    <object-name>cockpitdoor</object-name>
+    <object-name>canopyframe</object-name>
+    <object-name>frontcanopy</object-name>
+    <object-name>mast</object-name>
+    <object-name>rudder</object-name>
+    <property-base>sim/model/livery</property-base>
+    <texture-prop>texture</texture-prop>
+    
+  </animation>
+
+       
+   <!--GUNS-->
+<model>
+    <path>Aircraft/SpitfireVb_VooDoo/Models/Effects/guns/fire.xml</path>
+    <offsets>
+      <x-m> 1.43</x-m>
+      <y-m> -1.9 </y-m>
+      <z-m> -0.47 </z-m>
+      <roll-deg>    0 </roll-deg>
+      <pitch-deg> 180 </pitch-deg>
+      <heading-deg> 0 </heading-deg>
+    </offsets>
+  </model>
+  
+  <model>
+    <path>Aircraft/SpitfireVb_VooDoo/Models/Effects/guns/fire.xml</path>
+    <offsets>
+      <x-m> 2.37</x-m>
+      <y-m> -2.83 </y-m>
+      <z-m> -0.34 </z-m>
+      <roll-deg>    0 </roll-deg>
+      <pitch-deg> 180 </pitch-deg>
+      <heading-deg> 0 </heading-deg>
+    </offsets>
+  </model>
+  
+  <model>
+    <path>Aircraft/SpitfireVb_VooDoo/Models/Effects/guns/fire.xml</path>
+    <offsets>
+      <x-m> 2.45</x-m>
+      <y-m> -3.73 </y-m>
+      <z-m> -0.25 </z-m>
+      <roll-deg>    0 </roll-deg>
+      <pitch-deg> 180 </pitch-deg>
+      <heading-deg> 0 </heading-deg>
+    </offsets>
+  </model>
+
+  <!-- Droit -->
+  <model>
+    <path>Aircraft/SpitfireVb_VooDoo/Models/Effects/guns/fire.xml</path>
+    <offsets>
+      <x-m> 1.43</x-m>
+      <y-m> 1.9 </y-m>
+      <z-m> -0.47 </z-m>
+      <roll-deg>    0 </roll-deg>
+      <pitch-deg> 180 </pitch-deg>
+      <heading-deg> 0 </heading-deg>
+    </offsets>
+  </model>
+  
+  <model>
+    <path>Aircraft/SpitfireVb_VooDoo/Models/Effects/guns/fire.xml</path>
+    <offsets>
+      <x-m> 2.37</x-m>
+      <y-m> 2.83 </y-m>
+      <z-m> -0.34 </z-m>
+      <roll-deg>    0 </roll-deg>
+      <pitch-deg> 180 </pitch-deg>
+      <heading-deg> 0 </heading-deg>
+    </offsets>
+  </model>
+  
+  <model>
+    <path>Aircraft/SpitfireVb_VooDoo/Models/Effects/guns/fire.xml</path>
+    <offsets>
+      <x-m> 2.45</x-m>
+      <y-m> 3.73 </y-m>
+      <z-m> -0.25 </z-m>
+      <roll-deg>    0 </roll-deg>
+      <pitch-deg> 180 </pitch-deg>
+      <heading-deg> 0 </heading-deg>
+    </offsets>
+  </model>
+  
+  <!-- light pack -->
+	
+  <model>
+    <path>Aircraft/SpitfireVb_VooDoo/Models/lights/LightPack.xml</path>
+    <offsets>
+      <x-m>0</x-m>
+      <y-m>0</y-m>
+      <z-m>0</z-m>
+    </offsets>
+  </model>	
+	
+<!--	<model>
+    <name>FTag</name>
+    <path>/Aircraft/FTag/FTag-Models.xml</path>
+    <offsets>
+        <x-m>15</x-m>
+        <y-m>0</y-m>
+        <z-m>0</z-m>
+    </offsets>
+</model>-->
+
+<!-- De-select non-visibile parts when retracted -->
+
+  <animation>
+    <type>select</type>
+        <object-name>StarWheel</object-name>
+	<object-name>PortWheel</object-name>
+        <object-name>PortTire</object-name>
+        <object-name>StarTire</object-name>
+	<object-name>PortLowerStrut</object-name>
+        <object-name>StarLowerStrut</object-name>
+        <condition>
+      <greater-than>
+        <property>gear/gear[1]/position-norm</property>
+        <value>0.37</value>
+      </greater-than>
+    </condition>
+  </animation>
+ 
+ <animation>
+  <type>rotate</type>
+  <object-name>PortUpperStrut</object-name>
+  <object-name>PortLowerStrut</object-name>
+  <object-name>PortWheel</object-name>
+  <object-name>PortTire</object-name>
+  <object-name>PortGearDoor</object-name>
+  <property>gear/gear[0]/position-norm</property>
+ <interpolation>
+   <entry>
+    <ind>0.0</ind>
+    <dep>-96</dep>
+   </entry>
+   <entry>
+    <ind>0.33</ind>
+    <dep>-96</dep>
+   </entry>
+   <entry>
+    <ind>1.00</ind>
+    <dep>0.0</dep>
+   </entry>
+  </interpolation>
+  <center>
+   <x-m>2.822</x-m>
+   <y-m>-0.660</y-m>
+   <z-m>-0.658</z-m>
+  </center>
+  <axis>
+   <x>0.90</x>
+   <y>0.32</y>
+   <z>-0.41</z>
+  </axis>
+ </animation>
+
+ 
+ <animation>
+  <type>rotate</type>
+  <object-name>StarUpperStrut</object-name>
+  <object-name>StarLowerStrut</object-name>
+  <object-name>StarWheel</object-name>
+  <object-name>StarTire</object-name>
+  <object-name>StarGearDoor</object-name>
+  <property>gear/gear[1]/position-norm</property>
+  <interpolation>
+   <entry>
+    <ind>0.0</ind>
+    <dep>96</dep>
+   </entry>
+   <entry>
+    <ind>0.33</ind>
+    <dep>96</dep>
+   </entry>
+   <entry>
+    <ind>1.00</ind>
+    <dep>0.0</dep>
+   </entry>
+  </interpolation>
+  <center>
+   <x-m>2.822</x-m>
+   <y-m>0.660</y-m>
+   <z-m>-0.658</z-m>
+  </center>
+  <axis>
+   <x>0.90</x>
+   <y>-0.32</y>
+   <z>-0.41</z>
+  </axis>
+ </animation>
+
+<!-- Suspensions Compression -->
+  <animation>
+    <name>PortGearAssy</name>
+    <object-name>PortWheel</object-name>
+    <object-name>PortTire</object-name>
+    <object-name>PortLowerStrut</object-name>
+   </animation>
+  
+ 
+  <animation>
+    <type>translate</type>
+    <object-name>PortGearAssy</object-name>
+    <property>sim/multiplay/generic/float[14]</property>
+    <interpolation>
+      <entry><ind> 0.000 </ind><dep> -0.02 </dep></entry>
+      <entry><ind> 0.235 </ind><dep>  0.00 </dep></entry>
+      <entry><ind> 1.000 </ind><dep>  0.10 </dep></entry>
+    </interpolation>
+    <axis>
+      <x> 0 </x>
+      <y> 0 </y>
+      <z> 1 </z>
+    </axis>
+  </animation>
+ 
+  
+  <animation>
+    <name>StarGearAssy</name>
+    <object-name>StarWheel</object-name>
+    <object-name>StarTire</object-name>
+    <object-name>StarLowerStrut</object-name>
+   </animation>
+  
+   
+  <animation>
+    <type>translate</type>
+    <object-name>StarGearAssy</object-name>
+    <property>sim/multiplay/generic/float[15]</property>
+    <interpolation>
+      <entry><ind> 0.000 </ind><dep> -0.02 </dep></entry>
+      <entry><ind> 0.235 </ind><dep>  0.00 </dep></entry>
+      <entry><ind> 1.000 </ind><dep>  0.10 </dep></entry>
+    </interpolation>
+    <axis>
+      <x> 0 </x>
+      <y> 0 </y>
+      <z> 1 </z>
+    </axis>
+  </animation>
+
+ 
+<!-- Rolling Wheels -->
+
+<!-- Port Wheel -->
+  <animation>
+    <type>spin</type>
+    <object-name>PortWheel</object-name>
+    <object-name>PortTire</object-name>
+    <property>sim/multiplay/generic/float[10]</property>
+    <factor>-30 </factor>
+    <center>
+      <x-m>2.558</x-m>
+      <y-m>-0.844</y-m>
+      <z-m>-1.465</z-m>
+    </center>
+    <axis>
+      <x>0</x>
+      <y>1</y>
+      <z>0</z>
+    </axis>
+  </animation>
+
+<!-- Star Wheel -->
+
+  <animation>
+    <type>spin</type>
+    <object-name>StarWheel</object-name>
+    <object-name>StarTire</object-name>
+    <property>sim/multiplay/generic/float[9]</property>
+    <factor>-30 </factor>
+    <center>
+      <x-m>2.558</x-m>
+      <y-m>0.844</y-m>
+      <z-m>-1.465</z-m>
+    </center>
+    <axis>
+      <x>0</x>
+      <y>1</y>
+      <z>0</z>
+    </axis>
+  </animation>	
+
+<animation>
+    <type>spin</type>
+   <object-name>TailWheel</object-name>
+    <property>sim/multiplay/generic/float[11]</property>
+    <factor>30 </factor>
+    <center>
+      <x-m>8.626</x-m>
+      <y-m>0.000</y-m>
+      <z-m>-0.404</z-m>
+    </center>
+    <axis>
+      <x>  0 </x>
+      <y> -1 </y>
+      <z>  0 </z>
+    </axis>
+  </animation>
+
+ <model>
+    <path>Aircraft/SpitfireVb_VooDoo/Particles/smoke.xml</path>
+    <offsets>
+      <x-m>10.000</x-m>
+      <y-m>0</y-m>
+      <z-m>0.147</z-m>
+      <pitch-deg>0</pitch-deg>
+    </offsets>
+  </model>  
+
+  
+</PropertyList>

@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+
+<!-- Supermarine SpitfireVb_VooDoo -->
+
+<PropertyList>
+
+ <path>SpitfireVb_VooDoo.ac</path>
+ 
+ 
+	
+<!--shader	-->
+
+ <!--  REMBRANDT support for transparent objects-->
+  <effect>
+    <inherits-from>Effects/model-transparent</inherits-from>
+    <condition>
+      <property>sim/rendering/rembrandt/enabled</property>
+    </condition>
+  <object-name>glass</object-name>
+		<!--<object-name>NewGlass</object-name>
+		<object-name>NewGlass.001</object-name>-->
+		<object-name>noshadowspdisk</object-name>
+		<object-name>noshadowfpdisk</object-name>
+  </effect>
+	
+<!-- ALS effects 
+
+<effect>
+    <inherits-from>Aircraft/SpitfireVb_VooDoo/Models/Effects/fuselage/bumps</inherits-from>
+    <object-name>NewHull1</object-name>
+    <object-name>canopyframe</object-name>
+    <object-name>sub01</object-name>
+    <object-name>Rudder</object-name>
+    <object-name>PortAileron</object-name>
+    <object-name>Pitch_pivo</object-name>
+    <object-name>StarboardAileron</object-name>
+    <object-name>PortFlap</object-name>
+    <object-name>StarboardFlap</object-name>
+    <object-name>Port_Gear</object-name>
+    <object-name>Starboard_Gear</object-name>
+  </effect>	
+	-->
+	<effect>
+    <inherits-from>Aircraft/SpitfireVb_VooDoo/Models/Effects/glassout</inherits-from>
+      <object-name>NewGlass</object-name>
+		<object-name>canopy</object-name>
+ </effect>
+ 
+ <animation>
+  <type>select</type>
+  <object-name>NewGlass</object-name>
+		<object-name>canopy</object-name>
+  <condition>
+   <not>
+   <equals>
+    <property>sim/current-view/internal</property>
+    <value>true</value>
+   </equals>
+   </not>
+  </condition>
+ </animation>
+ 
+ 
+ <effect>
+    <inherits-from>Aircraft/SpitfireVb_VooDoo/Models/Effects/mirror/mirror</inherits-from>
+    <object-name>mirror</object-name>
+	
+  </effect>
+ 
+ 
+  <effect>
+       <inherits-from>Effects/glass</inherits-from>
+		<object-name>NewGlassin</object-name>
+		<object-name>canopyin</object-name>
+    </effect>
+	
+	 <animation>
+  <type>select</type>
+ <object-name>NewGlassin</object-name>
+		<object-name>canopyin</object-name>
+  <condition>
+
+   <equals>
+    <property>sim/current-view/internal</property>
+    <value>true</value>
+   </equals>
+   
+  </condition>
+ </animation>
+
+
+
+
+  
+</PropertyList>

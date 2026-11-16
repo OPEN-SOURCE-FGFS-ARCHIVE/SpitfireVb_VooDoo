@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+
+<PropertyList>
+<sim>
+    <model>
+        <livery>
+            <name type="string">RAF 616 Sqdn.</name>
+
+            <texture>Liveries/RAF616S.png</texture>
+
+	
+        </livery>
+		<spit>
+		 <hdr>false</hdr>
+		<als>true</als>
+		</spit>
+    </model>
+    <rendering>
+   <refl_correction type="string">-0.45</refl_correction>
+    </rendering>
+</sim>
+</PropertyList>

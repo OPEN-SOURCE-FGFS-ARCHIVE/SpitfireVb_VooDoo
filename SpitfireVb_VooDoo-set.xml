@@ -1,0 +1,372 @@
+<?xml version="1.0"?>
+<!--
+************************************************************************
+SpitfireVb_VooDoo configuration
+************************************************************************
+-->
+
+<PropertyList>
+
+ <sim>
+  <description>Supermarine Spitfire Mk Vb</description>
+  <author> Vodoun daVinci, Detlef Faber, StuartC, Vivian Meazza ( cockpit ), Gary Brown (Liveries)</author>
+  <status>1.1HDR </status>  
+  <flight-model>yasim</flight-model>
+  <aero>SpitfireVb_VooDoo-yasim</aero>
+  <fuel-fraction>1.0</fuel-fraction>
+
+<rendering>
+<refl_correction type="string">-0.51</refl_correction>
+<frensel-factor type="string">0.5</frensel-factor>
+</rendering>
+
+<previews>
+      <preview>
+        <type>exterior</type>
+        <splash type="bool">true</splash>
+        <path>Splashscreen/SpitfireVb_VooDoo_1.jpg</path>
+      </preview>
+      <preview>
+        <type>exterior</type>
+        <splash type="bool">true</splash>
+        <path>Splashscreen/SpitfireVb_VooDoo_2.jpg</path>
+      </preview>
+      <preview>
+        <type>exterior</type>
+        <splash type="bool">true</splash>
+        <path>Splashscreen/SpitfireVb_VooDoo_3.jpg</path>
+      </preview>
+     <preview>
+        <type>exterior</type>
+        <splash type="bool">true</splash>
+        <path>Splashscreen/SpitfireVb_VooDoo_4.jpg</path>
+      </preview>
+     <preview>
+        <type>exterior</type>
+        <splash type="bool">true</splash>
+        <path>Splashscreen/SpitfireVb_VooDoo_5.jpg</path>
+      </preview>
+     <preview>
+        <type>exterior</type>
+        <splash type="bool">true</splash>
+        <path>Splashscreen/Contrail.jpg</path>
+      </preview>
+    <preview>
+        <type>exterior</type>
+        <splash type="bool">true</splash>
+        <path>Splashscreen/Cockpit.jpg</path>
+      </preview>
+	  <preview>
+        <type>exterior</type>
+        <splash type="bool">true</splash>
+        <path>Splashscreen/fgfs-20240208125216.png</path>
+      </preview>
+	  <preview>
+        <type>interior</type>
+        <splash type="bool">true</splash>
+        <path>Splashscreen/fgfs-20240208133345.png</path>
+      </preview>
+    </previews>
+
+  <systems>
+   <electrical>
+    <path>Aircraft/Generic/generic-electrical.xml</path>
+	</electrical>
+	<autopilot>
+        <path>Aircraft/SpitfireVb_VooDoo/Systems/VooDooPropAP1.xml</path>
+      </autopilot>
+  <autopilot n="101">
+        <path>Aircraft/SpitfireVb_VooDoo/Systems/glass-rain.xml</path>
+      </autopilot>
+   
+  </systems> 
+  
+      
+  <virtual-cockpit archive="y">false</virtual-cockpit>
+  <allow-toggle-cockpit archive="y">false</allow-toggle-cockpit>
+
+  <sound>
+     <path>Aircraft/SpitfireVb_VooDoo/Sounds/sound.xml</path>
+  </sound>
+
+  <submodels> 
+    <serviceable type="bool">true</serviceable>
+  	 <path>Aircraft/SpitfireVb_VooDoo/Models/Effects/guns/submodels.xml</path>
+  </submodels>
+
+  <mp-systems>
+		<combat-enabled type="bool">true</combat-enabled>
+  </mp-systems>
+  
+  <panel>
+  <path>Aircraft/Generic/Panels/generic-vfr-panel.xml</path>
+  <visibility>false</visibility>
+  </panel>
+
+  <model>
+   <path>Aircraft/SpitfireVb_VooDoo/Models/SpitfireVb_VooDoo.xml</path>
+     <spit>
+		 <hdr>true</hdr>
+		<als>false</als>
+		</spit>
+   
+   <crew>
+      <pilot>
+        <visible>1.0</visible>
+      </pilot>
+   </crew>
+	  
+ </model> 
+ 
+  <rendering>
+   <refl_correction type="string">-0.45</refl_correction>
+    </rendering>
+	
+  <view n="0">
+   <internal archive="y">true</internal>
+   <config>
+    <x-offset-m archive="y" type="double">0.000</x-offset-m><!--right-->
+    <y-offset-m archive="y" type="double">0.57830</y-offset-m><!--up-->
+    <z-offset-m archive="y" type="double">4.14</z-offset-m><!--back-->
+    <default-field-of-view-deg>125</default-field-of-view-deg>
+    <pitch-offset-deg>-5</pitch-offset-deg>
+   </config>
+  </view>
+
+  <view n="1">
+   <config>
+    <target-z-offset-m archive="y" type="double">3.49</target-z-offset-m>
+	<pitch-offset-deg archive="y">3</pitch-offset-deg>
+   </config>
+  </view>
+
+  <view n="2">
+   <config>
+    <target-z-offset-m archive="y" type="double">3.49</target-z-offset-m>
+	<pitch-offset-deg archive="y">3</pitch-offset-deg>
+   </config>
+  </view>
+
+  <view n="3">
+   <config>
+    <target-z-offset-m archive="y" type="double">3.49</target-z-offset-m>
+	<pitch-offset-deg archive="y">3</pitch-offset-deg>
+   </config>
+  </view>
+
+  <view n="4">
+   <config>
+    <target-z-offset-m archive="y" type="double">3.49</target-z-offset-m>
+	<pitch-offset-deg archive="y">3</pitch-offset-deg>
+   </config>
+  </view>
+  <view n="5">
+   <config>
+    <target-z-offset-m archive="y" type="double">3.49</target-z-offset-m>
+	<pitch-offset-deg archive="y">3</pitch-offset-deg>
+   </config>
+  </view>
+  <view n="6">
+   <config>
+    <target-z-offset-m archive="y" type="double">3.49</target-z-offset-m>
+	<pitch-offset-deg archive="y">3</pitch-offset-deg>
+   </config>
+  </view>
+  <view n="7">
+   <config>
+    <target-z-offset-m archive="y" type="double">3.49</target-z-offset-m>
+	<pitch-offset-deg archive="y">3</pitch-offset-deg>
+   </config>
+  </view>
+
+  <hud>
+   <enable3d>false</enable3d>
+  </hud>  
+	<menubar>
+		<default>
+			<menu n="10">
+				<label>SpitfireVb_VooDoo</label>
+					<enabled type="bool">true</enabled>
+					<item>
+						<label>Select Livery</label>
+              <binding>
+                <command>nasal</command>
+                <script>aircraft.livery.dialog.toggle()</script>
+              </binding>
+					</item>
+		      
+			</menu>
+		</default>
+	</menubar>
+
+	<multiplay>
+      <chat_display>1</chat_display>
+      <generic>            	    
+        <int n="0" alias="/controls/switches/nav-lights-switch" />                      
+        <int n="1" alias="/controls/switches/beacon-switch" />                     
+        <int n="2" alias="/controls/switches/landing-lights-switch" />                         
+        <int n="3" alias="/controls/switches/strobe-switch" />                                     
+        <int n="4" alias="/controls/smoke" />                                     
+        <int type="int" n="5">  0 </int>                                     
+        <int type="bool" n="6"> 1 </int>                                     
+        <int n="7" alias="/sim/crashed" />                                  
+        <int n="8" alias="/systems/electrical/outputs/nav-lights">  0 </int>  <!-- 8 nav-lights -->
+        <int n="9" alias="/sim/model/lights/beacon/state">  false </int>      <!-- 9 strobe-lights -->
+        <int n="10" alias="/controls/electric/key-pos">  0 </int>             <!-- 10 key position -->
+        <float n="0" alias="/sim/model/door-positions/crew/position-norm"/>
+        <float n="1" alias="/sim/model/door-positions/passenger/position-norm"/>
+        <float n="2" alias="/position/gear-agl-m"> 0 </float>                         <!-- altitude for MP shadow -->
+        <float n="3" alias="/position/altitude-ft"> 0 </float>                        <!-- altitude for Smoke/Trail -->
+        <float n="4" alias="/engines/engine[0]/rpm"/>
+        <float n="5" alias="/engines/engine[0]/cranking"/>
+        <float n="6" alias="/gear/gear[0]/wow/"/>
+        <float n="7" alias="/gear/gear[1]/wow/"/>
+        <float n="8" alias="/gear/gear[2]/wow/"/>
+        <float n="9" alias="/gear/gear[0]/rollspeed-ms"/>
+        <float n="10" alias="/gear/gear[1]/rollspeed-ms"/>
+        <float n="11" alias="/gear/gear[2]/rollspeed-ms"/>
+        <float n="12" alias="/velocities/airspeed-kt"/>
+        <float n="13" alias="/controls/flight/aileron"/>
+        <float n="14" alias="/gear/gear[1]/compression-norm"/>
+        <float n="15" alias="/gear/gear[2]/compression-norm"/>
+        <float n="16" alias="/gear/gear[2]/caster-angle-deg"/>
+        <!-- For Bombable -->
+        <int type="int" n="10" alias="controls/armament/trigger">0</int>
+        <string n="9" type="string" />
+      </generic>
+    </multiplay>
+ <flight-recorder>
+      <replay-config type="int">0</replay-config>
+      <config n="0" include="/Aircraft/Generic/flightrecorder/generic-jet.xml">
+        <name type="string">B-1B Flight Recorder</name>
+         <signal>
+          <type>float</type> <!-- Canopy Position -->
+          <property type="string">sim/model/door-positions/crew/position-norm</property>
+        </signal>
+        <signal>
+          <type>float</type> <!-- Slider Position -->
+          <property type="string">sim/model/door-positions/passenger/position-norm</property>
+        </signal>
+                     
+	<signal>
+          <type>float</type>
+          <property type="string">/environment/relative-humidity</property>
+        </signal>
+        <signal>
+          <type>float</type>
+          <property type="string">/environment/temperature-degc</property>
+        </signal>
+       <signal>
+          <type>float</type>
+          <property type="string">velocities/airspeed-kt</property>
+        </signal>
+          <signal>
+          <type>float</type>
+          <property type="string">/sim/multiplay/generic/int[1]</property>
+        </signal>
+
+       </config>
+    </flight-recorder>	
+
+</sim>
+
+<consumables>
+    <fuel>
+      <tank n="0">
+        <tank-num type="int">0</tank-num>
+        <level-gal_us archive="y">250</level-gal_us>
+      </tank>
+      
+	  
+    </fuel>
+  </consumables>
+
+
+   <environment>
+    <turbulence>
+      <use-cloud-turbulence>true</use-cloud-turbulence>
+    </turbulence>
+   </environment>
+
+
+ <engines>
+  <engine n="0">
+  <running>false</running>
+  <magnetos>1</magnetos>
+  <!--
+   <rpm type="double">700</rpm>
+   -->
+   <!-- fake unimplemented settings -->
+   <fuel-pump-psi type="double">18</fuel-pump-psi>
+   <oil-pressure-psi type="double">75</oil-pressure-psi>
+  </engine>
+ </engines>
+
+
+ <!-- set up control properties for YASim -->
+ <controls>
+  <gear>
+      <brake-parking type="double">1.0</brake-parking>
+    </gear>
+	<armament>
+     <trigger type="bool">false</trigger>
+     <master-arm type="bool">true</master-arm>
+     <position-norm type="int">1</position-norm>
+    </armament>
+   <engines>
+      <engine n="0">
+        <magnetos>0</magnetos>
+        <boost type="double">0.45</boost>
+				<blower type="int">0</blower>
+      </engine>
+   </engines>
+	 <flight>
+			<slipstream type="double">1.0</slipstream>
+			<aileron-effectiveness type ="double">0.1</aileron-effectiveness>
+	 </flight>
+   <gear>
+      <tailwheel-lock>true</tailwheel-lock>
+   </gear>
+   <canopy>
+      <canopy-pos-norm type="float">1.0</canopy-pos-norm>
+   </canopy>
+
+ <smoke alias="/sim/multiplay/generic/int[4]"/>
+
+ </controls>
+
+ <!-- Map Keys -->
+ <input>
+    <keyboard include="Systems/daVinci-keyboard.xml"/>
+
+	<!-- <joysticks>
+	   <js n="0" include="Input/X55-stick.xml" />
+	   <js n="1" include="Input/X55-throttle.xml" />
+	  </joysticks>-->
+	</input>
+
+<!-- Nasal files/scripts -->
+  <nasal>
+
+    <SpitfireVb_VooDoo>
+      <file>Aircraft/SpitfireVb_VooDoo/Nasal/spit9.nas</file>
+      <file>Aircraft/SpitfireVb_VooDoo/Nasal/liveries.nas</file>
+    </SpitfireVb_VooDoo>
+	<guns>
+      <file>Aircraft/SpitfireVb_VooDoo/Nasal/weapons.nas</file>
+      <file>Aircraft/SpitfireVb_VooDoo/Nasal/revi.nas</file>
+    </guns>
+    <lights>
+      <file>Aircraft/SpitfireVb_VooDoo/Nasal/Lights.nas</file>
+    </lights>
+   <doors>
+      <file>Aircraft/SpitfireVb_VooDoo/Nasal/doors.nas</file>
+    </doors>
+   
+  </nasal>
+
+</PropertyList>
+
+
+
+

@@ -1,0 +1,135 @@
+<?xml version="1.0"?>
+
+<PropertyList>
+  <name type="string">Saitek Pro Flight X-55 Rhino Stick</name>
+  <axis>
+    <desc type="string">Aileron</desc>
+    <binding>
+      <command type="string">property-scale</command>
+      <property type="string">/controls/flight/aileron</property>
+      <dead-band type="double">0</dead-band>
+      <factor type="double">1</factor>
+      <offset type="double">0</offset>
+	  <squared type="bool">true</squared>
+    </binding>
+  </axis>
+  <axis n="1">
+    <desc type="string">Elevator</desc>
+    <binding>
+      <command type="string">property-scale</command>
+      <property type="string">/controls/flight/elevator</property>
+      <dead-band type="double">0</dead-band>
+      <factor type="double">-1</factor>
+      <offset type="double">0</offset>
+	  <squared type="bool">true</squared>
+    </binding>
+  </axis>
+  <axis n="3">
+    <desc type="string">Rudder</desc>
+    <binding>
+      <command type="string">property-scale</command>
+      <property type="string">/controls/flight/rudder</property>
+      <dead-band type="double">0</dead-band>
+      <factor type="double">1</factor>
+      <offset type="double">0</offset>
+	  <squared type="bool">true</squared>
+    </binding>
+  </axis>
+  
+    <!-- Stick Buttons/Switches -->
+  
+  <button n="5">
+    <desc>Autopilot Cancel</desc>
+    <repeatable type="bool">false</repeatable>
+  <binding>
+   <command>nasal</command>
+   <script>autopilot.apCancel()</script>
+  </binding>
+  </button>
+  
+ <button n="6">
+  <desc>Elevator trim down</desc>
+  <repeatable type="bool">true</repeatable>
+  <binding>
+   <command>nasal</command>
+   <script>controls.elevatorTrim(1)</script>
+  </binding>
+ </button>
+
+ <button n="7">
+  <desc>Aileron trim right</desc>
+  <repeatable type="bool">true</repeatable>
+  <binding>
+   <command>nasal</command>
+   <script>controls.aileronTrim(1)</script>
+  </binding>
+ </button>
+
+ <button n="8">
+  <desc>Elevator trim up</desc>
+  <repeatable type="bool">true</repeatable>
+  <binding>
+   <command>nasal</command>
+   <script>controls.elevatorTrim(-1)</script>
+  </binding>
+ </button>
+
+ <button n="9">
+  <desc>Aileron trim left</desc>
+  <repeatable type="bool">true</repeatable>
+  <binding>
+   <command>nasal</command>
+   <script>controls.aileronTrim(-1)</script>
+  </binding>
+ </button>
+
+  <button n="12">
+  <desc>Autopilot Decrease Pitch</desc>
+  <repeatable type="bool">true</repeatable>
+  <binding>
+   <command>property-adjust</command>
+   <property>/instrumentation/director-horizon/pitch-setting-deg</property>
+   <step>0.25</step>
+   <min>-30</min>
+   <max>30</max>
+  </binding>
+ </button>
+ 
+ <button n="11">
+  <desc>Autopilot Roll Right</desc>
+  <repeatable type="bool">true</repeatable>
+  <binding>
+   <command>property-adjust</command>
+   <property>/instrumentation/mk10-autopilot/bank-selector</property>
+   <step>0.25</step>
+   <min>-40</min>
+   <max>40</max>
+  </binding>
+  </button>
+ 
+  <button n="10">
+  <desc>Autopilot Increase Pitch</desc>
+  <repeatable type="bool">true</repeatable>
+  <binding>
+   <command>property-adjust</command>
+   <property>/instrumentation/director-horizon/pitch-setting-deg</property>
+   <step>-0.25</step>
+   <min>-30</min>
+   <max>30</max>
+  </binding>
+  </button>
+ 
+  <button n="13">
+  <desc>Autopilot Roll Left</desc>
+  <repeatable type="bool">true</repeatable>
+  <binding>
+   <command>property-adjust</command>
+   <property>/instrumentation/mk10-autopilot/bank-selector</property>
+   <step>-0.25</step>
+   <min>-40</min>
+   <max>40</max>
+  </binding>
+  </button>
+  
+  </PropertyList>
+

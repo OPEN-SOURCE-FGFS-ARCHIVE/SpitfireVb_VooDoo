@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+
+<PropertyList>
+<sim>
+    <model>
+        <livery>
+            <name type="string">USAAF, 4FS, 52FG - Voodoo Chile</name>
+
+            <texture>Liveries/USAAF4FS52FG.png</texture>
+
+	
+        </livery>
+		<spit>
+		 <hdr>false</hdr>
+		<als>true</als>
+		</spit>
+    </model>
+    <rendering>
+   <refl_correction type="string">-0.45</refl_correction>
+    </rendering>
+</sim>
+</PropertyList>

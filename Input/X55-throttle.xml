@@ -1,0 +1,193 @@
+<?xml version="1.0"?>
+
+<PropertyList>
+  <name type="string">Saitek Pro Flight X-55 Rhino Throttle</name>
+  
+  <axis n="0">
+    <desc type="string">Throttle Left</desc>
+    <binding>
+      <command type="string">property-scale</command>
+      <property type="string">/controls/engines/engine[0]/throttle</property>
+	  <dead-band type="double">0</dead-band>
+      <factor type="double">-0.5</factor>
+      <offset type="double">-1</offset>
+    </binding>
+  </axis>
+  
+  <axis n="1">
+    <desc type="string">Throttle Right</desc>
+    <binding>
+      <command type="string">property-scale</command>
+      <property type="string">/controls/engines/engine[1]/throttle</property>
+	  <dead-band type="double">0</dead-band>
+      <factor type="double">-0.5</factor>
+      <offset type="double">-1</offset>
+    </binding>
+  </axis>
+  
+  <axis n="2">
+    <desc type="string">Speedbrake</desc>
+    <binding>
+      <command type="string">property-scale</command>
+      <property type="string">/controls/flight/speedbrake</property>
+	  <dead-band type="double">0</dead-band>
+      <factor type="double">1</factor>
+      <offset type="double">0</offset>
+    </binding>
+  </axis>
+  
+  <axis n="3">
+    <desc type="string">Prop Pitch</desc>
+    <binding>
+      <command type="string">property-scale</command>
+      <property type="string">/controls/engines/engine[0]/propeller-pitch</property>
+	  <dead-band type="double">0</dead-band>
+      <factor type="double">0.5</factor>
+      <offset type="double">-1</offset>
+    </binding>
+    <binding>
+      <command type="string">property-scale</command>
+      <property type="string">/controls/engines/engine[1]/propeller-pitch</property>
+	  <dead-band type="double">0</dead-band>
+      <factor type="double">0.5</factor>
+      <offset type="double">-1</offset>
+    </binding>
+    <binding>
+      <command type="string">property-scale</command>
+      <property type="string">/controls/engines/engine[2]/propeller-pitch</property>
+	  <dead-band type="double">0</dead-band>
+      <factor type="double">0.5</factor>
+      <offset type="double">-1</offset>
+    </binding>
+    <binding>
+      <command type="string">property-scale</command>
+      <property type="string">/controls/engines/engine[3]/propeller-pitch</property>
+	  <dead-band type="double">0</dead-band>
+      <factor type="double">0.5</factor>
+      <offset type="double">-1</offset>
+    </binding>
+  </axis>
+  
+  <axis n="4">
+    <desc type="string">Mixture</desc>
+    <binding>
+      <command type="string">property-scale</command>
+      <property type="string">/controls/engines/engine[0]/mixture</property>
+	  <dead-band type="double">0</dead-band>
+      <factor type="double">0.5</factor>
+      <offset type="double">-1</offset>
+    </binding>
+    <binding>
+      <command type="string">property-scale</command>
+      <property type="string">/controls/engines/engine[1]/mixture</property>
+	  <dead-band type="double">0</dead-band>
+      <factor type="double">0.5</factor>
+      <offset type="double">-1</offset>
+    </binding>
+    <binding>
+      <command type="string">property-scale</command>
+      <property type="string">/controls/engines/engine[2]/mixture</property>
+	  <dead-band type="double">0</dead-band>
+      <factor type="double">0.5</factor>
+      <offset type="double">-1</offset>
+    </binding>
+    <binding>
+      <command type="string">property-scale</command>
+      <property type="string">/controls/engines/engine[3]/mixture</property>
+	  <dead-band type="double">0</dead-band>
+      <factor type="double">0.5</factor>
+      <offset type="double">-1</offset>
+    </binding>
+  </axis>
+  
+  <button n="0">
+    <desc>Autothrottle </desc>
+    <repeatable type="bool">false</repeatable>
+  <binding>
+   <command>property-cycle</command>
+   <property>/systems/autopilot/locks/speed</property>
+   <value></value>
+   <value>speed-with-throttle</value>
+  </binding>
+  </button>
+  
+  <button n="2"> <!-- Wheelbrakes -->
+    <desc type="string">Brakes</desc>
+    <repeatable type="string">false</repeatable>
+    <binding>
+      <command type="string">nasal</command>
+      <script type="string">controls.applyBrakes(1);</script>
+    </binding>
+    <mod-up>
+      <binding>
+        <command type="string">nasal</command>
+        <script type="string">controls.applyBrakes(0);</script>
+      </binding>
+    </mod-up>
+  </button>
+  
+  <!-- Toggle Switches, Left Hand Side -->
+  
+  <button n="9">
+    <desc type="string">Lift Dump On</desc>
+    <repeatable type="string">false</repeatable>
+    <binding>
+      <command type="string">property-assign</command>
+      <property type="string">/controls/switches/lift-dump</property>
+	  <value type="bool">true</value>
+    </binding>
+  </button>
+  
+  <button n="10">
+    <desc type="string">Lift Dump Off</desc>
+    <repeatable type="string">false</repeatable>
+    <binding>
+      <command type="string">property-assign</command>
+      <property type="string">/controls/switches/lift-dump</property>
+	  <value type="bool">false</value>
+    </binding>
+  </button>
+  
+  <button n="11">
+    <desc type="string">Gear Up</desc>
+    <repeatable type="string">false</repeatable>
+    <binding>
+      <command type="string">property-assign</command>
+      <property type="string">/controls/gear/gear-down</property>
+	  <value type="bool">false</value>
+    </binding>
+  </button>
+  
+  <button n="12">
+    <desc type="string">Gear Down</desc>
+    <repeatable type="string">false</repeatable>
+    <binding>
+      <command type="string">property-assign</command>
+      <property type="string">/controls/gear/gear-down</property>
+	  <value type="bool">true</value>
+    </binding>
+  </button>
+  
+  <!-- Toggle Switches, Left Hand Side -->
+  
+  <button n="31">
+    <desc type="string">Master Arm Off</desc>
+    <repeatable type="string">false</repeatable>
+    <binding>
+      <command type="string">property-assign</command>
+      <property type="string">/controls/rotary/MASS</property>
+	  <value type="double">0</value>
+    </binding>
+  </button>
+  
+<button n="32">
+    <desc type="string">Master Arm On</desc>
+    <repeatable type="string">false</repeatable>
+    <binding>
+      <command type="string">property-assign</command>
+      <property type="string">/controls/gear/gear-down</property>
+	  <value type="double">1</value>
+    </binding>
+  </button>
+  
+</PropertyList>
